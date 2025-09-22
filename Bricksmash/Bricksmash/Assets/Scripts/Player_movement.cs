@@ -11,6 +11,7 @@ public class Player_movement : MonoBehaviour
     public Rigidbody2D MyRigidBody;
     public float MoveSpeed;
     public float JumpSpeed;
+    public float VaultSpeed;
     private int i;
     private bool IsMovingX = false;
     private bool IsMovingY = false;
@@ -101,13 +102,23 @@ public class Player_movement : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+
+        if (collision.gameObject.tag == "HorizontalCollider")
+        {
+            IsMovingX = false;
+            IsMovingY = false;
+            Quaternion rotation = Quaternion.Euler(0, 0, 0);
+            transform.SetLocalPositionAndRotation(transform.localPosition, rotation);
+            i = 1;
+        }
+
         if (collision.gameObject.tag == "LeftCollider")
         {
             IsMovingX = false;
             IsMovingY = false;
             Quaternion rotation = Quaternion.Euler(0, 0, -90);
             transform.SetLocalPositionAndRotation(transform.localPosition, rotation);
-            i = 1;
+            i = 2;
         }
 
         else if (collision.gameObject.tag == "RightCollider")
@@ -116,7 +127,7 @@ public class Player_movement : MonoBehaviour
             IsMovingY = false;
             Quaternion rotation = Quaternion.Euler(0, 0, 90);
             transform.SetLocalPositionAndRotation(transform.localPosition, rotation);
-            i = 2;
+            i = 3;
         }
 
         else if (collision.gameObject.tag == "UpCollider")
@@ -125,16 +136,59 @@ public class Player_movement : MonoBehaviour
             IsMovingY = false;
             Quaternion rotation = Quaternion.Euler(0, 0, 180);
             transform.SetLocalPositionAndRotation(transform.localPosition, rotation);
-            i = 3;
+            i = 4;
         }
 
-        else if (collision.gameObject.tag == "HorizontalCollider")
+    }
+
+    private void OnTriggerExit2D(Collider2D collision2)
+    {
+        if (i == 1 && collision2.gameObject.tag == "HorizontalCollider")
         {
-            IsMovingX = false;
-            IsMovingY = false;
-            Quaternion rotation = Quaternion.Euler(0, 0, 0);
-            transform.SetLocalPositionAndRotation(transform.localPosition, rotation);
-            i = 4;
+            if (MyRigidBody.velocity.x > 0)
+                MyRigidBody.velocity = new Vector2(VaultSpeed, 0);
+
+            else if (MyRigidBody.velocity.x < 0)
+                MyRigidBody.velocity = new Vector2(-VaultSpeed, 0);
+
+            else
+                return;
+        }
+
+        if (i == 2 && collision2.gameObject.tag == "LeftCollider")
+        {
+            if (MyRigidBody.velocity.y > 0)
+                MyRigidBody.velocity = new Vector2(0, VaultSpeed);
+
+            else if (MyRigidBody.velocity.y < 0)
+                MyRigidBody.velocity = new Vector2(0, -VaultSpeed);
+
+            else
+                return;
+        }
+
+        if (i == 3 && collision2.gameObject.tag == "RightCollider")
+        {
+            if (MyRigidBody.velocity.y > 0)
+                MyRigidBody.velocity = new Vector2(0, VaultSpeed);
+
+            else if (MyRigidBody.velocity.y < 0)
+                MyRigidBody.velocity = new Vector2(0, -VaultSpeed);
+
+            else
+                return;
+        }
+
+        if (i == 4 && collision2.gameObject.tag == "UpCollider")
+        {
+            if (MyRigidBody.velocity.x > 0)
+                MyRigidBody.velocity = new Vector2(VaultSpeed, 0);
+
+            else if (MyRigidBody.velocity.x < 0)
+                MyRigidBody.velocity = new Vector2(-VaultSpeed, 0);
+
+            else
+                return;
         }
     }
 
@@ -143,32 +197,36 @@ public class Player_movement : MonoBehaviour
         switch (i)
         {
             case 1:
-                VerticalLeftMovement();
-                break;
-            case 2:
-                VerticalRightMovement();
-                break;
-            case 3:
-                UpSideDownMovement();
-                break;
-            case 4:
                 HorizontalMovement();
                 break;
+            case 2:
+                VerticalLeftMovement();
+                break;
+            case 3:
+                VerticalRightMovement();
+                break;
+            case 4:
+                UpSideDownMovement();
+                break;
         }
 
-        if (IsMovingX == true)
+        if (IsMovingX)
         {
             MyRigidBody.constraints = RigidbodyConstraints2D.FreezePositionY;
+            MyRigidBody.drag = 0;
         }
 
-        else if (IsMovingY == true)
+        else if (IsMovingY)
         {
             MyRigidBody.constraints = RigidbodyConstraints2D.FreezePositionX;
+            MyRigidBody.drag = 0;
         }
 
         else
         {
             MyRigidBody.constraints = RigidbodyConstraints2D.None;
+            MyRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+            MyRigidBody.drag = 10;
         }
 
     }
