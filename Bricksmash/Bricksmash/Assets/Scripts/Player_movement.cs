@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 public class Player_movement : MonoBehaviour
 {
     public Rigidbody2D MyRigidBody;
+    public Animator MyAnimator;
     public float MoveSpeed;
     public float JumpSpeed;
     public float VaultSpeed;
@@ -192,6 +193,25 @@ public class Player_movement : MonoBehaviour
         }
     }
 
+    private void MainCharacterAnimation()
+    {
+        if (IsMovingX || IsMovingY)
+            MyAnimator.SetBool("Is_Jumping", true);
+
+        else
+            MyAnimator.SetBool("Is_Jumping", false);
+
+        if (IsMovingX == false || IsMovingY == false)
+        {
+            if (MoveSpeed != 0) 
+                MyAnimator.SetBool("Is_Dashing", true);
+        }
+
+        else
+            MyAnimator.SetBool("Is_Dashing", false);
+
+    }
+
     private void Update()
     {
         switch (i)
@@ -213,12 +233,14 @@ public class Player_movement : MonoBehaviour
         if (IsMovingX)
         {
             MyRigidBody.constraints = RigidbodyConstraints2D.FreezePositionY;
+            MyRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
             MyRigidBody.drag = 0;
         }
 
         else if (IsMovingY)
         {
             MyRigidBody.constraints = RigidbodyConstraints2D.FreezePositionX;
+            MyRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
             MyRigidBody.drag = 0;
         }
 
@@ -228,6 +250,8 @@ public class Player_movement : MonoBehaviour
             MyRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
             MyRigidBody.drag = 10;
         }
+
+        MainCharacterAnimation();
 
     }
 
