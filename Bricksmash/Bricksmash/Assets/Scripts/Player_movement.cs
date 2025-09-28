@@ -25,85 +25,32 @@ public class Player_movement : MonoBehaviour
                 MyRigidBody.velocity = new Vector2(MoveSpeed, 0);
         }
 
-        else if (Keyboard.current.aKey.wasPressedThisFrame || Keyboard.current.leftArrowKey.wasPressedThisFrame)
-        {
-            if (IsMovingY == false)
-                MyRigidBody.velocity = new Vector2(-MoveSpeed, 0);
-        }
-
-        else if (Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
-        {
-            IsMovingY = true;
-            MyRigidBody.velocity = new Vector2(0, JumpSpeed);
-        }
-    }
-
-    public void VerticalLeftMovement()
-    {
-        if (Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame)
-        {
-            if (IsMovingX == false)
-                MyRigidBody.velocity = new Vector2(0, -MoveSpeed);
-        }
-
-        if (Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
-        {
-            if (IsMovingX == false)
-                MyRigidBody.velocity = new Vector2(0, MoveSpeed);
-        }
-
-        if (Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame)
-        {
-            IsMovingX = true;
-            MyRigidBody.velocity = new Vector2(JumpSpeed, 0);
-        }
-    }
-
-    public void VerticalRightMovement()
-    {
-        if (Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame)
-        {
-            if (IsMovingX == false)
-                MyRigidBody.velocity = new Vector2(0, -MoveSpeed);
-        }
-
-        if (Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
-        {
-            if (IsMovingX == false)
-                MyRigidBody.velocity = new Vector2(0, MoveSpeed);
-        }
-
         if (Keyboard.current.aKey.wasPressedThisFrame || Keyboard.current.leftArrowKey.wasPressedThisFrame)
         {
-            IsMovingX = true;
-            MyRigidBody.velocity = new Vector2(-JumpSpeed, 0);
-        }
-    }
-
-    public void UpSideDownMovement()
-    {
-        if (Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame)
-        {
-            if (IsMovingY == false)
-                MyRigidBody.velocity = new Vector2(MoveSpeed, 0);
-        }
-
-        else if (Keyboard.current.aKey.wasPressedThisFrame || Keyboard.current.leftArrowKey.wasPressedThisFrame)
-        {
             if (IsMovingY == false)
                 MyRigidBody.velocity = new Vector2(-MoveSpeed, 0);
         }
 
-        else if (Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame)
+    }
+
+    public void VerticalMovement()
+    {
+        if (Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame)
         {
-            IsMovingY = true;
-            MyRigidBody.velocity = new Vector2(0, -JumpSpeed);
+            if (IsMovingX == false)
+                MyRigidBody.velocity = new Vector2(0, -MoveSpeed);
         }
+
+        if (Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
+        {
+            if (IsMovingX == false)
+                MyRigidBody.velocity = new Vector2(0, MoveSpeed);
+        }
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-
         if (collision.gameObject.tag == "HorizontalCollider")
         {
             IsMovingX = false;
@@ -198,17 +145,29 @@ public class Player_movement : MonoBehaviour
         if (IsMovingX || IsMovingY)
             MyAnimator.SetBool("Is_Jumping", true);
 
-        else
-            MyAnimator.SetBool("Is_Jumping", false);
-
-        if (IsMovingX == false || IsMovingY == false)
+        if (MyRigidBody.velocity.x > 10 || MyRigidBody.velocity.x < -10)
         {
-            if (MoveSpeed != 0) 
-                MyAnimator.SetBool("Is_Dashing", true);
+            if (MyRigidBody.velocity.x < -10)
+                MyAnimator.SetBool("Is_Mirrored", true);
+
+            MyAnimator.SetBool("Is_Dashing", true);
+        }
+
+        else if (MyRigidBody.velocity.y > 10 || MyRigidBody.velocity.y < -10)
+        {
+            if (MyRigidBody.velocity.y < -10)
+                MyAnimator.SetBool("Is_Mirrored", true);
+
+            MyAnimator.SetBool("Is_Dashing", true);
         }
 
         else
+        {
+            MyAnimator.SetBool("Is_Mirrored", false);
+            MyAnimator.SetBool("Is_Jumping", false);
             MyAnimator.SetBool("Is_Dashing", false);
+        }
+
 
     }
 
@@ -218,15 +177,42 @@ public class Player_movement : MonoBehaviour
         {
             case 1:
                 HorizontalMovement();
+
+                if (Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
+                {
+                    IsMovingY = true;
+                    MyRigidBody.velocity = new Vector2(0, JumpSpeed);
+                }
                 break;
+
             case 2:
-                VerticalLeftMovement();
+                VerticalMovement();
+
+                if (Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame)
+                {
+                    IsMovingX = true;
+                    MyRigidBody.velocity = new Vector2(JumpSpeed, 0);
+                }
                 break;
+
             case 3:
-                VerticalRightMovement();
+                VerticalMovement();
+
+                if (Keyboard.current.aKey.wasPressedThisFrame || Keyboard.current.leftArrowKey.wasPressedThisFrame)
+                {
+                    IsMovingX = true;
+                    MyRigidBody.velocity = new Vector2(-JumpSpeed, 0);
+                }
                 break;
+
             case 4:
-                UpSideDownMovement();
+                HorizontalMovement();
+
+                if (Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame)
+                {
+                    IsMovingY = true;
+                    MyRigidBody.velocity = new Vector2(0, -JumpSpeed);
+                }
                 break;
         }
 
